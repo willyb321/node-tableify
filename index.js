@@ -2,8 +2,8 @@
 
 module.exports = tableify;
 
-function tableify(obj, columns, parents) {
-    var buf = [];
+function tableify(obj, columns, parents, skipClass) {
+	var buf = [];
     var type = typeof obj;
     var cols;
 
@@ -22,20 +22,20 @@ function tableify(obj, columns, parents) {
         if (Array.isArray(obj[0]) && obj.every(Array.isArray)) {
             buf.push('<table>','<tbody>');
             cols = [];
-            
+
             // 2D array is an array of rows
             obj.forEach(function (row, ix) {
                 cols.push(ix);
 
                 buf.push('<tr>');
-                
+
                 row.forEach(function (val) {
-                    buf.push('<td' + getClass(val) + '>', tableify(val, cols, parents), '</td>')
+                    buf.push('<td' + getClass(val, skipClass) + '>', tableify(val, cols, parents), '</td>')
                 });
-                
+
                 buf.push('</tr>');
             });
-            
+
             buf.push('</tbody>','</table>');
         }
         else if (typeof obj[0] === 'object') {
@@ -54,7 +54,7 @@ function tableify(obj, columns, parents) {
             cols = Object.keys(keys);
 
             cols.forEach(function (key) {
-                buf.push('<th' + getClass(obj[0][key]) + '>', key, '</th>');
+                buf.push('<th' + getClass(obj[0][key], skipClass) + '>', key, '</th>');
             });
 
             buf.push('</tr>', '</thead>', '<tbody>');
@@ -73,7 +73,7 @@ function tableify(obj, columns, parents) {
 
             obj.forEach(function (val, ix) {
                 cols.push(ix);
-                buf.push('<tr>', '<td' + getClass(val) + '>', tableify(val, cols, parents), '</td>', '</tr>');
+                buf.push('<tr>', '<td' + getClass(val, skipClass) + '>', tableify(val, cols, parents), '</td>', '</tr>');
             });
 
             buf.push('</tbody>','</table>');
@@ -85,7 +85,7 @@ function tableify(obj, columns, parents) {
             buf.push('<table>');
 
             Object.keys(obj).forEach(function (key) {
-                buf.push('<tr>', '<th' + getClass(obj[key]) + '>', key, '</th>', '<td' + getClass(obj[key]) + '>', tableify(obj[key], false, parents), '</td>', '</tr>');
+                buf.push('<tr>', '<th' + getClass(obj[key], skipClass) + '>', key, '</th>', '<td' + getClass(obj[key], skipClass) + '>', tableify(obj[key], false, parents), '</td>', '</tr>');
             });
 
             buf.push('</table>');
@@ -93,10 +93,10 @@ function tableify(obj, columns, parents) {
         else {
             columns.forEach(function (key) {
                 if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
-                    buf.push('<td' + getClass(obj[key]) + '>', tableify(obj[key], false, parents), '</td>');
+                    buf.push('<td' + getClass(obj[key], skipClass) + '>', tableify(obj[key], false, parents), '</td>');
                 }
                 else {
-                    buf.push('<td' + getClass(obj[key]) + '>', tableify(obj[key], columns, parents), '</td>');
+                    buf.push('<td' + getClass(obj[key], skipClass) + '>', tableify(obj[key], columns, parents), '</td>');
                 }
             });
         }
@@ -114,8 +114,9 @@ function tableify(obj, columns, parents) {
     return buf.join('');
 }
 
-function getClass(obj) {
-    return ' class="'
+function getClass(obj, skipClass) {
+	if (!skipClass) {
+		return ' class="'
         + ((obj && obj.constructor && obj.constructor.name)
             ? obj.constructor.name
             : typeof obj || ''
@@ -126,4 +127,6 @@ function getClass(obj) {
         )
         + '"'
         ;
+	}
+	return '';
 }
