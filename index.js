@@ -30,7 +30,7 @@ function tableify(obj, columns, parents, skipClass) {
                 buf.push('<tr>');
 
                 row.forEach(function (val) {
-                    buf.push('<td' + getClass(val, skipClass) + '>', tableify(val, cols, parents), '</td>')
+                    buf.push('<td' + getClass(val, skipClass) + '>', tableify(val, cols, parents, skipClass), '</td>')
                 });
 
                 buf.push('</tr>');
@@ -61,7 +61,7 @@ function tableify(obj, columns, parents, skipClass) {
 
             obj.forEach(function (record) {
                 buf.push('<tr>');
-                buf.push(tableify(record, cols, parents));
+                buf.push(tableify(record, cols, parents, skipClass));
                 buf.push('</tr>');
             });
 
@@ -73,7 +73,7 @@ function tableify(obj, columns, parents, skipClass) {
 
             obj.forEach(function (val, ix) {
                 cols.push(ix);
-                buf.push('<tr>', '<td' + getClass(val, skipClass) + '>', tableify(val, cols, parents), '</td>', '</tr>');
+                buf.push('<tr>', '<td' + getClass(val, skipClass) + '>', tableify(val, cols, parents, skipClass), '</td>', '</tr>');
             });
 
             buf.push('</tbody>','</table>');
@@ -85,7 +85,7 @@ function tableify(obj, columns, parents, skipClass) {
             buf.push('<table>');
 
             Object.keys(obj).forEach(function (key) {
-                buf.push('<tr>', '<th' + getClass(obj[key], skipClass) + '>', key, '</th>', '<td' + getClass(obj[key], skipClass) + '>', tableify(obj[key], false, parents), '</td>', '</tr>');
+                buf.push('<tr>', '<th' + getClass(obj[key], skipClass) + '>', key, '</th>', '<td' + getClass(obj[key], skipClass) + '>', tableify(obj[key], false, parents, skipClass), '</td>', '</tr>');
             });
 
             buf.push('</table>');
@@ -93,10 +93,10 @@ function tableify(obj, columns, parents, skipClass) {
         else {
             columns.forEach(function (key) {
                 if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
-                    buf.push('<td' + getClass(obj[key], skipClass) + '>', tableify(obj[key], false, parents), '</td>');
+                    buf.push('<td' + getClass(obj[key], skipClass) + '>', tableify(obj[key], false, parents, skipClass), '</td>');
                 }
                 else {
-                    buf.push('<td' + getClass(obj[key], skipClass) + '>', tableify(obj[key], columns, parents), '</td>');
+                    buf.push('<td' + getClass(obj[key], skipClass) + '>', tableify(obj[key], columns, parents, skipClass), '</td>');
                 }
             });
         }
